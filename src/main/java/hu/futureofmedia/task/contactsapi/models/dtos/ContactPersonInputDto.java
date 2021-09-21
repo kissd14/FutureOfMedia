@@ -1,5 +1,6 @@
 package hu.futureofmedia.task.contactsapi.models.dtos;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -17,6 +18,7 @@ public class ContactPersonInputDto {
   @NotNull
   private Long companyId;
   @NotEmpty
+  @Email
   private String email;
   private String phoneNumber;
   private String note;
