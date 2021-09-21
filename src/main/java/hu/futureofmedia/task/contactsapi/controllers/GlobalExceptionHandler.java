@@ -50,10 +50,10 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleResourceAlreadyExists(
       MyResourceAlreadyExistException exception) {
 
-    HttpStatus notFound = HttpStatus.CONFLICT;
-    return ResponseEntity.status(notFound).body(
+    HttpStatus conflict = HttpStatus.CONFLICT;
+    return ResponseEntity.status(conflict).body(
         ErrorResponse.builder()
-            .status(notFound)
+            .status(conflict)
             .message(exception.getMessage())
             .errors(Collections.emptyList())
             .build()

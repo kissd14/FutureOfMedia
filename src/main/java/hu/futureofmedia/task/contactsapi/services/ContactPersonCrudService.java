@@ -5,7 +5,7 @@ import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 
 public interface ContactPersonCrudService {
-  ContactPersonsResponseDto getAll(Integer page);
+  ContactPersonsResponseDto getAll(Integer page, Integer pageSize);
 
   ContactPersonDetailedResponseDto getById(Long id);
 

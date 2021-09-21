@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContactPersonService implements ContactPersonCrudService{
   @Override
-  public ContactPersonsResponseDto getAll(Integer page) {
+  public ContactPersonsResponseDto getAll(Integer page, Integer pageSize) {
     return null;
   }
 
