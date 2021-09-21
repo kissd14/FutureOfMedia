@@ -20,6 +20,7 @@ public class ContactPersonInputDto {
   @NotEmpty
   @Email
   private String email;
+  @NotEmpty
   private String phoneNumber;
   private String note;
 }
