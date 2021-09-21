@@ -16,7 +16,7 @@ CREATE TABLE contact_persons
     note           VARCHAR(255),
     status         VARCHAR(7)   NOT NULL,
     created_at      TIMESTAMP    NOT NULL,
-    lastModified_at TIMESTAMP    NOT NULL,
+    last_modified_at TIMESTAMP    NOT NULL,
     FOREIGN KEY (company_id) REFERENCES company (id)
 );
 
@@ -26,7 +26,7 @@ values ('Company #1'),
        ('Company #3');
 
 insert into contact_persons (last_name, first_name, email, phone_number, company_id, note, status, created_at,
-                             lastModified_at)
+                             last_modified_at)
 values ('John', 'Doe', 'johndeo@gmail.com', '+36701234567', 1, 'great at listening', 'ACTIVE',
         '2021-06-22 19:10:25-07', '2021-06-22 19:10:25-07'),
        ('John', 'Smith', 'johnsmith@gmail.com', '+36208536458', 2, 'fast learner', 'ACTIVE',
