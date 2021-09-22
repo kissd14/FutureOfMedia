@@ -32,7 +32,6 @@ public class ContactPersonService implements ContactPersonCrudService {
                                         Company company) throws NumberParseException {
 
     PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-
     Phonenumber.PhoneNumber phoneNumber =
         phoneUtil.parse(contactPersonInputDto.getPhoneNumber(), "ZZ");
 
@@ -73,8 +72,21 @@ public class ContactPersonService implements ContactPersonCrudService {
   }
 
   @Override
-  public void update(ContactPersonInputDto contactPersonInputDto) {
-
+  public void update(ContactPersonInputDto contactPersonInputDto, Long id)
+      throws NumberParseException {
+    if (!contactPersonRepository.findById(id).isPresent()) {
+      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+    }
+    if (!companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).isPresent()) {
+      throw new MyResourceNotFoundException(
+          "There is no company with id: " + contactPersonInputDto.getCompanyId() + ".");
+    }
+    Company company = companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).get();
+    ContactPerson contactPerson = contactPersonRepository.findById(id).get();
+    ContactPerson contactPersonToSave = convertToEntity(contactPersonInputDto, company);
+    contactPersonToSave.setId(id);
+    contactPersonToSave.setCreatedAt(contactPerson.getCreatedAt());
+    contactPersonRepository.save(contactPersonToSave);
   }
 
   @Override

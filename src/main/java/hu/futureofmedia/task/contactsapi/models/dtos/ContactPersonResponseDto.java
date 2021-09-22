@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContactPersonResponseDto {
+  private Long id;
   private String name;
   private String companyName;
   private String email;

@@ -12,7 +12,7 @@ public interface ContactPersonCrudService {
 
   void create(ContactPersonInputDto contactPersonInputDto) throws NumberParseException;
 
-  void update(ContactPersonInputDto contactPersonInputDto);
+  void update(ContactPersonInputDto contactPersonInputDto, Long id) throws NumberParseException;
 
   void delete(Long id);
 }
