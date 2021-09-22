@@ -11,6 +11,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,16 +36,18 @@ public class ContactPersonController {
   }
 
   @GetMapping("/{id}")
-  public ContactPersonDetailedResponseDto getById(@PathVariable @Positive Long id) {
-    return contactPersonService.getById(id);
+  public ResponseEntity<ContactPersonDetailedResponseDto> getById(@PathVariable @Positive Long id) {
+    return ResponseEntity.ok(contactPersonService.getById(id));
   }
 
   @GetMapping()
-  public ContactPersonsResponseDto getAllOnThePage(@RequestParam @Min(value = 1) Integer page,
-                                                   @RequestParam(required = false)
-                                                   @Positive @Max(value = 50)
-                                                       Integer pageSize) {
-    return contactPersonService.getAll(page, Objects.requireNonNullElse(pageSize, 10));
+  public ResponseEntity<ContactPersonsResponseDto> getAllOnThePage(
+      @RequestParam @Min(value = 1) Integer page,
+      @RequestParam(required = false)
+      @Positive @Max(value = 50)
+          Integer pageSize) {
+    return ResponseEntity.ok(
+        contactPersonService.getAll(page, Objects.requireNonNullElse(pageSize, 10)));
   }
 
   @PostMapping
@@ -55,6 +58,7 @@ public class ContactPersonController {
   }
 
   @PutMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(@RequestBody @Valid ContactPersonInputDto contactPersonInputDto, @PathVariable
   @Positive Long id)
       throws NumberParseException {
@@ -62,6 +66,7 @@ public class ContactPersonController {
   }
 
   @DeleteMapping("/{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable @Positive Long id) {
     contactPersonService.delete(id);
   }
