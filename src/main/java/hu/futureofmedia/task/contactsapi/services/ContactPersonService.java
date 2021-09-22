@@ -75,10 +75,10 @@ public class ContactPersonService implements ContactPersonCrudService {
   @Override
   public void update(ContactPersonInputDto contactPersonInputDto, Long id)
       throws NumberParseException {
-    if (!contactPersonRepository.findById(id).isPresent()) {
+    if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
       throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
     }
-    ContactPerson contactPerson = contactPersonRepository.findById(id).get();
+    ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
     ContactPerson contactPersonToSave = convertToEntity(contactPersonInputDto);
     contactPersonToSave.setId(id);
     contactPersonToSave.setCreatedAt(contactPerson.getCreatedAt());
