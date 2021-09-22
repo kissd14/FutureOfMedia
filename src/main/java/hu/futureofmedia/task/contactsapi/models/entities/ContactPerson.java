@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import hu.futureofmedia.task.contactsapi.models.enums.Status;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "contact_persons")
 public class ContactPerson {
   @Id
@@ -30,6 +34,7 @@ public class ContactPerson {
   @JsonBackReference
   private Company company;
   private String note;
+  @Enumerated(EnumType.STRING)
   private Status status;
   private LocalDateTime createdAt;
   private LocalDateTime lastModifiedAt;
