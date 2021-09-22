@@ -6,6 +6,7 @@ import hu.futureofmedia.task.contactsapi.services.ContactPersonCrudService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -36,5 +37,10 @@ public class ContactPersonController {
   @Positive Long id)
       throws NumberParseException {
     contactPersonService.update(contactPersonInputDto, id);
+  }
+
+  @DeleteMapping("/{id}")
+  public void delete(@PathVariable @Positive Long id) {
+    contactPersonService.delete(id);
   }
 }

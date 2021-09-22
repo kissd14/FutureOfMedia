@@ -87,6 +87,11 @@ public class ContactPersonService implements ContactPersonCrudService {
 
   @Override
   public void delete(Long id) {
-
+    if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
+      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+    }
+    ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
+    contactPerson.setStatus(Status.DELETED);
+    contactPersonRepository.save(contactPerson);
   }
 }
