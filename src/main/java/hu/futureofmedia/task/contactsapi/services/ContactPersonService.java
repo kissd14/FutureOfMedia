@@ -28,8 +28,8 @@ public class ContactPersonService implements ContactPersonCrudService {
     this.companyRepository = companyRepository;
   }
 
-  private ContactPerson convertToEntity(ContactPersonInputDto contactPersonInputDto,
-                                        Company company) throws NumberParseException {
+  private ContactPerson convertToEntity(ContactPersonInputDto contactPersonInputDto)
+      throws NumberParseException {
 
     PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
     Phonenumber.PhoneNumber phoneNumber =
@@ -42,6 +42,12 @@ public class ContactPersonService implements ContactPersonCrudService {
     String formattedPhoneNumber =
         phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
 
+    if (!companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).isPresent()) {
+      throw new MyResourceNotFoundException(
+          "There is no company with id: " + contactPersonInputDto.getCompanyId());
+    }
+
+    Company company = companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).get();
     return new ContactPerson(null, contactPersonInputDto.getLastName(),
         contactPersonInputDto.getFirstName(), contactPersonInputDto.getEmail(),
         formattedPhoneNumber, company, contactPersonInputDto.getNote(),
@@ -62,12 +68,7 @@ public class ContactPersonService implements ContactPersonCrudService {
 
   @Override
   public void create(ContactPersonInputDto contactPersonInputDto) throws NumberParseException {
-    if (!companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).isPresent()) {
-      throw new MyResourceNotFoundException(
-          "There is no company with id: " + contactPersonInputDto.getCompanyId());
-    }
-    Company company = companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).get();
-    ContactPerson contactPerson = convertToEntity(contactPersonInputDto, company);
+    ContactPerson contactPerson = convertToEntity(contactPersonInputDto);
     contactPersonRepository.save(contactPerson);
   }
 
@@ -77,13 +78,8 @@ public class ContactPersonService implements ContactPersonCrudService {
     if (!contactPersonRepository.findById(id).isPresent()) {
       throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
     }
-    if (!companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).isPresent()) {
-      throw new MyResourceNotFoundException(
-          "There is no company with id: " + contactPersonInputDto.getCompanyId() + ".");
-    }
-    Company company = companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).get();
     ContactPerson contactPerson = contactPersonRepository.findById(id).get();
-    ContactPerson contactPersonToSave = convertToEntity(contactPersonInputDto, company);
+    ContactPerson contactPersonToSave = convertToEntity(contactPersonInputDto);
     contactPersonToSave.setId(id);
     contactPersonToSave.setCreatedAt(contactPerson.getCreatedAt());
     contactPersonRepository.save(contactPersonToSave);
