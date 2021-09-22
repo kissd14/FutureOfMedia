@@ -7,6 +7,7 @@ import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceNotFound
 import hu.futureofmedia.task.contactsapi.models.errorhandling.PhoneNumberFormatException;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +30,20 @@ public class GlobalExceptionHandler {
                     .map(i -> i.getField() + ": " + i.getDefaultMessage())
                     .collect(Collectors.toList())
             )
+            .build()
+    );
+  }
+
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+      ConstraintViolationException exception) {
+
+    HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(badRequest).body(
+        ErrorResponse.builder()
+            .status(badRequest)
+            .message(exception.getMessage())
+            .errors(Collections.emptyList())
             .build()
     );
   }

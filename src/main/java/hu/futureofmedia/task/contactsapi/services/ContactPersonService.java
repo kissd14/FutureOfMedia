@@ -5,6 +5,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
+import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonResponseDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
@@ -14,6 +15,9 @@ import hu.futureofmedia.task.contactsapi.models.errorhandling.PhoneNumberFormatE
 import hu.futureofmedia.task.contactsapi.repositories.CompanyRepository;
 import hu.futureofmedia.task.contactsapi.repositories.ContactPersonRepository;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -63,9 +67,24 @@ public class ContactPersonService implements ContactPersonCrudService {
         contactPerson.getLastModifiedAt());
   }
 
+  private ContactPersonResponseDto convertToContactPersonResponseDto(ContactPerson contactPerson) {
+    return new ContactPersonResponseDto(contactPerson.getId(), contactPerson.getFirstName() + " " +
+        contactPerson.getLastName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
+        contactPerson.getPhoneNumber());
+  }
+
   @Override
   public ContactPersonsResponseDto getAll(Integer page, Integer pageSize) {
-    return null;
+    List<ContactPersonResponseDto> contactPersonResponseDtoList = new ArrayList<>();
+    List<ContactPerson> contactPersonList =
+        contactPersonRepository.getAllByPageAndPageSize(PageRequest.of(page-1, pageSize));
+    for (ContactPerson contactPerson : contactPersonList) {
+      ContactPersonResponseDto contactPersonResponseDto =
+          convertToContactPersonResponseDto(contactPerson);
+      contactPersonResponseDtoList.add(contactPersonResponseDto);
+    }
+    return new ContactPersonsResponseDto(page, pageSize, contactPersonList.size(),
+        contactPersonResponseDtoList);
   }
 
 
