@@ -1,12 +1,14 @@
 package hu.futureofmedia.task.contactsapi.controllers;
 
 import com.google.i18n.phonenumbers.NumberParseException;
+import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
 import hu.futureofmedia.task.contactsapi.services.ContactPersonCrudService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,6 +25,11 @@ public class ContactPersonController {
   public ContactPersonController(
       ContactPersonCrudService contactPersonService) {
     this.contactPersonService = contactPersonService;
+  }
+
+  @GetMapping("/{id}")
+  public ContactPersonDetailedResponseDto getById(@PathVariable @Positive Long id) {
+    return contactPersonService.getById(id);
   }
 
   @PostMapping

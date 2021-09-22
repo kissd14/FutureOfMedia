@@ -55,6 +55,14 @@ public class ContactPersonService implements ContactPersonCrudService {
         LocalDateTime.now(), LocalDateTime.now());
   }
 
+  private ContactPersonDetailedResponseDto convertToContactPersonDetailedResponseDto(
+      ContactPerson contactPerson) {
+    return new ContactPersonDetailedResponseDto(contactPerson.getFirstName(),
+        contactPerson.getLastName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
+        contactPerson.getPhoneNumber(), contactPerson.getNote(), contactPerson.getCreatedAt(),
+        contactPerson.getLastModifiedAt());
+  }
+
   @Override
   public ContactPersonsResponseDto getAll(Integer page, Integer pageSize) {
     return null;
@@ -63,7 +71,13 @@ public class ContactPersonService implements ContactPersonCrudService {
 
   @Override
   public ContactPersonDetailedResponseDto getById(Long id) {
-    return null;
+    if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
+      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+    }
+    ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
+    ContactPersonDetailedResponseDto contactPersonDetailedResponseDto =
+        convertToContactPersonDetailedResponseDto(contactPerson);
+    return contactPersonDetailedResponseDto;
   }
 
   @Override

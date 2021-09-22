@@ -1,11 +1,13 @@
 package hu.futureofmedia.task.contactsapi.models.dtos;
 
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class ContactPersonDetailedResponseDto {
 
   private String firstName;
