@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -43,6 +45,34 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(badRequest)
             .message(exception.getMessage())
+            .errors(Collections.emptyList())
+            .build()
+    );
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(
+      HttpMessageNotReadableException exception) {
+    Throwable mostSpecificCause = exception.getMostSpecificCause();
+    HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(badRequest).body(
+        ErrorResponse.builder()
+            .status(badRequest)
+            .message(mostSpecificCause.getMessage())
+            .errors(Collections.emptyList())
+            .build()
+    );
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+      MethodArgumentTypeMismatchException exception) {
+    HttpStatus badRequest = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(badRequest).body(
+        ErrorResponse.builder()
+            .status(badRequest)
+            .message(String.format("'%s' should be a valid '%s' and '%s' isn't",
+                exception.getName(), exception.getRequiredType().getSimpleName(), exception.getValue()))
             .errors(Collections.emptyList())
             .build()
     );
