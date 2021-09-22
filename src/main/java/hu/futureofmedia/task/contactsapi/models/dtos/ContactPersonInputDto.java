@@ -10,17 +10,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContactPersonInputDto {
-  @NotEmpty(message = "stringValue has to be present")
+  @NotEmpty
   private String firstName;
-  @NotEmpty(message = "stringValue has to be present")
+  @NotEmpty
   private String lastName;
-  @Positive(message = "longValue has to be positive")
-  @NotNull(message = "longValue has to be present")
+  @Positive
+  @NotNull
   private Long companyId;
-  @NotEmpty(message = "stringValue has to be present")
-  @Email(message = "stringValue has to have email format")
+  @NotEmpty
+  @Email
   private String email;
-  @NotEmpty(message = "stringValue has to be present")
+  @NotEmpty
   private String phoneNumber;
   private String note;
 }
