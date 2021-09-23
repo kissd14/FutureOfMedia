@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
     implementation group: 'com.googlecode.libphonenumber', name: 'libphonenumber', version: '8.10.14'
     compileOnly 'org.projectlombok:lombok:1.18.20'
