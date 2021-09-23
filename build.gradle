@@ -26,6 +26,8 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation group: 'org.junit', name: 'junit5-engine', version: '5.0.0-ALPHA'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.8.0'
 }
 
 test {

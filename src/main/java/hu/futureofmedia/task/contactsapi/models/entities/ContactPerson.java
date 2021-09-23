@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "contact_persons")
+@EqualsAndHashCode(exclude = {"createdAt","lastModifiedAt","id"})
 public class ContactPerson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

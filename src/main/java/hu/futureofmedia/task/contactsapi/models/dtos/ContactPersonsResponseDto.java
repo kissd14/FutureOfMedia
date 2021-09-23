@@ -3,12 +3,14 @@ package hu.futureofmedia.task.contactsapi.models.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@EqualsAndHashCode
 public class ContactPersonsResponseDto {
   @Schema(description = "Index of the page")
   private Integer page;

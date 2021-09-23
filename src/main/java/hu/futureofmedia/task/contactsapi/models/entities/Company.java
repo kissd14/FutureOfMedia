@@ -18,4 +18,9 @@ public class Company {
   private String name;
   @OneToMany
   private Set<ContactPerson> contactPersons;
+
+  public Company(Long id, String name) {
+    this.id = id;
+    this.name = name;
+  }
 }
