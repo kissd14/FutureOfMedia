@@ -23,8 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 class ContactPersonServiceTest {
   private CompanyRepository companyRepository;
@@ -78,17 +76,17 @@ class ContactPersonServiceTest {
   void getAllShouldReturn3Records() {
     ContactPersonResponseDto contactPersonResponseDto1 =
         new ContactPersonResponseDto(contactPerson1.getId(),
-            contactPerson1.getFirstName() + " " + contactPerson1.getLastName(),
+            contactPerson1.getLastName() + " " + contactPerson1.getFirstName(),
             contactPerson1.getCompany().getName(), contactPerson1.getEmail(),
             contactPerson1.getPhoneNumber());
     ContactPersonResponseDto contactPersonResponseDto2 =
         new ContactPersonResponseDto(contactPerson2.getId(),
-            contactPerson2.getFirstName() + " " + contactPerson2.getLastName(),
+            contactPerson2.getLastName() + " " + contactPerson2.getFirstName(),
             contactPerson2.getCompany().getName(), contactPerson2.getEmail(),
             contactPerson2.getPhoneNumber());
     ContactPersonResponseDto contactPersonResponseDto3 =
         new ContactPersonResponseDto(contactPerson3.getId(),
-            contactPerson3.getFirstName() + " " + contactPerson3.getLastName(),
+            contactPerson3.getLastName() + " " + contactPerson3.getFirstName(),
             contactPerson3.getCompany().getName(), contactPerson3.getEmail(),
             contactPerson3.getPhoneNumber());
     List<ContactPersonResponseDto> contactPersonResponseDtoList = new ArrayList<>();
@@ -101,8 +99,9 @@ class ContactPersonServiceTest {
     contactPersonList.add(contactPerson1);
     contactPersonList.add(contactPerson2);
     contactPersonList.add(contactPerson3);
-    Mockito.when(contactPersonRepository.getAllByPageAndPageSize(Mockito.any())).thenReturn(contactPersonList);
-    Assertions.assertEquals(contactPersonsResponseDto,contactPersonService.getAll(1,10));
+    Mockito.when(contactPersonRepository.getAllByPageAndPageSize(Mockito.any()))
+        .thenReturn(contactPersonList);
+    Assertions.assertEquals(contactPersonsResponseDto, contactPersonService.getAll(1, 10));
   }
 
   @Test

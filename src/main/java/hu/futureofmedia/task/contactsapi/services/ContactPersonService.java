@@ -68,8 +68,8 @@ public class ContactPersonService implements ContactPersonCrudService {
   }
 
   private ContactPersonResponseDto convertToContactPersonResponseDto(ContactPerson contactPerson) {
-    return new ContactPersonResponseDto(contactPerson.getId(), contactPerson.getFirstName() + " " +
-        contactPerson.getLastName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
+    return new ContactPersonResponseDto(contactPerson.getId(), contactPerson.getLastName() + " " +
+        contactPerson.getFirstName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
         contactPerson.getPhoneNumber());
   }
 
