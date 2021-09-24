@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ContactPersonService implements ContactPersonCrudService {
@@ -69,15 +70,17 @@ public class ContactPersonService implements ContactPersonCrudService {
 
   private ContactPersonResponseDto convertToContactPersonResponseDto(ContactPerson contactPerson) {
     return new ContactPersonResponseDto(contactPerson.getId(), contactPerson.getLastName() + " " +
-        contactPerson.getFirstName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
+        contactPerson.getFirstName(), contactPerson.getCompany().getName(),
+        contactPerson.getEmail(),
         contactPerson.getPhoneNumber());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ContactPersonsResponseDto getAll(Integer page, Integer pageSize) {
     List<ContactPersonResponseDto> contactPersonResponseDtoList = new ArrayList<>();
     List<ContactPerson> contactPersonList =
-        contactPersonRepository.getAllByPageAndPageSize(PageRequest.of(page-1, pageSize));
+        contactPersonRepository.getAllByPageAndPageSize(PageRequest.of(page - 1, pageSize));
     for (ContactPerson contactPerson : contactPersonList) {
       ContactPersonResponseDto contactPersonResponseDto =
           convertToContactPersonResponseDto(contactPerson);
@@ -89,6 +92,7 @@ public class ContactPersonService implements ContactPersonCrudService {
 
 
   @Override
+  @Transactional(readOnly = true)
   public ContactPersonDetailedResponseDto getById(Long id) {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
       throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
@@ -100,12 +104,14 @@ public class ContactPersonService implements ContactPersonCrudService {
   }
 
   @Override
+  @Transactional
   public void create(ContactPersonInputDto contactPersonInputDto) throws NumberParseException {
     ContactPerson contactPerson = convertToEntity(contactPersonInputDto);
     contactPersonRepository.save(contactPerson);
   }
 
   @Override
+  @Transactional
   public void update(ContactPersonInputDto contactPersonInputDto, Long id)
       throws NumberParseException {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
@@ -119,6 +125,7 @@ public class ContactPersonService implements ContactPersonCrudService {
   }
 
   @Override
+  @Transactional
   public void delete(Long id) {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
       throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
