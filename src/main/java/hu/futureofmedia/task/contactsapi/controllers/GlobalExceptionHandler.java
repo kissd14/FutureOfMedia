@@ -3,7 +3,7 @@ package hu.futureofmedia.task.contactsapi.controllers;
 import com.google.i18n.phonenumbers.NumberParseException;
 import hu.futureofmedia.task.contactsapi.models.errorhandling.ErrorResponse;
 import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceAlreadyExistException;
-import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceNotFoundException;
+import hu.futureofmedia.task.contactsapi.models.errorhandling.ResourceNotFoundException;
 import hu.futureofmedia.task.contactsapi.models.errorhandling.PhoneNumberFormatException;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -121,9 +121,9 @@ public class GlobalExceptionHandler {
     );
   }
 
-  @ExceptionHandler(MyResourceNotFoundException.class)
+  @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ErrorResponse> handleNotFoundException(
-      MyResourceNotFoundException exception) {
+      ResourceNotFoundException exception) {
 
     HttpStatus notFound = HttpStatus.NOT_FOUND;
     return ResponseEntity.status(notFound).body(

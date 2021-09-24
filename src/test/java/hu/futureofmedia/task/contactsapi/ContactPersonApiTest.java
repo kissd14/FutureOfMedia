@@ -17,7 +17,7 @@ import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
 import hu.futureofmedia.task.contactsapi.models.enums.Status;
-import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceNotFoundException;
+import hu.futureofmedia.task.contactsapi.models.errorhandling.ResourceNotFoundException;
 import hu.futureofmedia.task.contactsapi.services.ContactPersonCrudService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -225,7 +225,7 @@ public class ContactPersonApiTest {
   public void getByIdShouldResponseNotFound()
       throws Exception {
     Mockito.when(contactPersonService.getById(Mockito.anyLong())).thenThrow(
-        MyResourceNotFoundException.class);
+        ResourceNotFoundException.class);
     mockMvc.perform(get("/api/contactperson/1"))
         .andExpect(status().isNotFound());
   }
@@ -256,7 +256,7 @@ public class ContactPersonApiTest {
   @DisplayName("update should return 404, because of the provided id parameter doesn't exist in the database")
   @Test
   public void updateShouldResponseNotFound() throws Exception {
-    Mockito.doThrow(new MyResourceNotFoundException("")).when(contactPersonService)
+    Mockito.doThrow(new ResourceNotFoundException("")).when(contactPersonService)
         .update(Mockito.any(ContactPersonInputDto.class), Mockito.anyLong());
     mockMvc.perform(put("/api/contactperson/1")
             .contentType(MediaType.APPLICATION_JSON)
@@ -276,7 +276,7 @@ public class ContactPersonApiTest {
   @DisplayName("delete should return 404, because of the provided id parameter doesn't exist in the database")
   @Test
   public void deleteShouldResponseNotFound() throws Exception {
-    Mockito.doThrow(new MyResourceNotFoundException("")).when(contactPersonService)
+    Mockito.doThrow(new ResourceNotFoundException("")).when(contactPersonService)
         .delete(Mockito.anyLong());
     mockMvc.perform(delete("/api/contactperson/1"))
         .andExpect(status().isNotFound());

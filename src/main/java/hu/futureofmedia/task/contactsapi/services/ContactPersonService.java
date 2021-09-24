@@ -10,8 +10,8 @@ import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
 import hu.futureofmedia.task.contactsapi.models.enums.Status;
-import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceNotFoundException;
 import hu.futureofmedia.task.contactsapi.models.errorhandling.PhoneNumberFormatException;
+import hu.futureofmedia.task.contactsapi.models.errorhandling.ResourceNotFoundException;
 import hu.futureofmedia.task.contactsapi.repositories.CompanyRepository;
 import hu.futureofmedia.task.contactsapi.repositories.ContactPersonRepository;
 import java.time.LocalDateTime;
@@ -25,18 +25,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class ContactPersonService implements ContactPersonCrudService {
   private final ContactPersonRepository contactPersonRepository;
   private final CompanyRepository companyRepository;
+  private final PhoneNumberUtil phoneUtil;
 
   public ContactPersonService(
       ContactPersonRepository contactPersonRepository,
-      CompanyRepository companyRepository) {
+      CompanyRepository companyRepository,
+      PhoneNumberUtil phoneUtil) {
     this.contactPersonRepository = contactPersonRepository;
     this.companyRepository = companyRepository;
+    this.phoneUtil = phoneUtil;
   }
 
   private ContactPerson convertToEntity(ContactPersonInputDto contactPersonInputDto)
       throws NumberParseException {
 
-    PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+
     Phonenumber.PhoneNumber phoneNumber =
         phoneUtil.parse(contactPersonInputDto.getPhoneNumber(), "ZZ");
 
@@ -48,29 +51,42 @@ public class ContactPersonService implements ContactPersonCrudService {
         phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.E164);
 
     if (!companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).isPresent()) {
-      throw new MyResourceNotFoundException(
+      throw new ResourceNotFoundException(
           "There is no company with id: " + contactPersonInputDto.getCompanyId());
     }
 
     Company company = companyRepository.findCompanyById(contactPersonInputDto.getCompanyId()).get();
-    return new ContactPerson(null, contactPersonInputDto.getLastName(),
-        contactPersonInputDto.getFirstName(), contactPersonInputDto.getEmail(),
-        formattedPhoneNumber, company, contactPersonInputDto.getNote(),
+    return new ContactPerson(
+        null,
+        contactPersonInputDto.getLastName(),
+        contactPersonInputDto.getFirstName(),
+        contactPersonInputDto.getEmail(),
+        formattedPhoneNumber,
+        company,
+        contactPersonInputDto.getNote(),
         Status.ACTIVE,
-        LocalDateTime.now(), LocalDateTime.now());
+        LocalDateTime.now(),
+        LocalDateTime.now());
   }
 
   private ContactPersonDetailedResponseDto convertToContactPersonDetailedResponseDto(
       ContactPerson contactPerson) {
-    return new ContactPersonDetailedResponseDto(contactPerson.getFirstName(),
-        contactPerson.getLastName(), contactPerson.getCompany().getName(), contactPerson.getEmail(),
-        contactPerson.getPhoneNumber(), contactPerson.getNote(), contactPerson.getCreatedAt(),
+    return new ContactPersonDetailedResponseDto(
+        contactPerson.getFirstName(),
+        contactPerson.getLastName(),
+        contactPerson.getCompany().getName(),
+        contactPerson.getEmail(),
+        contactPerson.getPhoneNumber(),
+        contactPerson.getNote(),
+        contactPerson.getCreatedAt(),
         contactPerson.getLastModifiedAt());
   }
 
   private ContactPersonResponseDto convertToContactPersonResponseDto(ContactPerson contactPerson) {
-    return new ContactPersonResponseDto(contactPerson.getId(), contactPerson.getLastName() + " " +
-        contactPerson.getFirstName(), contactPerson.getCompany().getName(),
+    return new ContactPersonResponseDto(
+        contactPerson.getId(),
+        contactPerson.getLastName() + " " + contactPerson.getFirstName(),
+        contactPerson.getCompany().getName(),
         contactPerson.getEmail(),
         contactPerson.getPhoneNumber());
   }
@@ -86,7 +102,10 @@ public class ContactPersonService implements ContactPersonCrudService {
           convertToContactPersonResponseDto(contactPerson);
       contactPersonResponseDtoList.add(contactPersonResponseDto);
     }
-    return new ContactPersonsResponseDto(page, pageSize, contactPersonList.size(),
+    return new ContactPersonsResponseDto(
+        page,
+        pageSize,
+        contactPersonList.size(),
         contactPersonResponseDtoList);
   }
 
@@ -95,7 +114,7 @@ public class ContactPersonService implements ContactPersonCrudService {
   @Transactional(readOnly = true)
   public ContactPersonDetailedResponseDto getById(Long id) {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
-      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+      throw new ResourceNotFoundException("There is no contact person with id: " + id + ".");
     }
     ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
     ContactPersonDetailedResponseDto contactPersonDetailedResponseDto =
@@ -115,7 +134,7 @@ public class ContactPersonService implements ContactPersonCrudService {
   public void update(ContactPersonInputDto contactPersonInputDto, Long id)
       throws NumberParseException {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
-      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+      throw new ResourceNotFoundException("There is no contact person with id: " + id + ".");
     }
     ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
     ContactPerson contactPersonToSave = convertToEntity(contactPersonInputDto);
@@ -128,7 +147,7 @@ public class ContactPersonService implements ContactPersonCrudService {
   @Transactional
   public void delete(Long id) {
     if (!contactPersonRepository.findByIdAndStatusActive(id).isPresent()) {
-      throw new MyResourceNotFoundException("There is no contact person with id: " + id + ".");
+      throw new ResourceNotFoundException("There is no contact person with id: " + id + ".");
     }
     ContactPerson contactPerson = contactPersonRepository.findByIdAndStatusActive(id).get();
     contactPerson.setStatus(Status.DELETED);

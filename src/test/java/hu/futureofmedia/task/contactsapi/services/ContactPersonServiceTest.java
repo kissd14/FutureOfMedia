@@ -4,6 +4,7 @@ import static org.mockito.Mockito.times;
 
 
 import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonResponseDto;
@@ -11,7 +12,7 @@ import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
 import hu.futureofmedia.task.contactsapi.models.enums.Status;
-import hu.futureofmedia.task.contactsapi.models.errorhandling.MyResourceNotFoundException;
+import hu.futureofmedia.task.contactsapi.models.errorhandling.ResourceNotFoundException;
 import hu.futureofmedia.task.contactsapi.repositories.CompanyRepository;
 import hu.futureofmedia.task.contactsapi.repositories.ContactPersonRepository;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ class ContactPersonServiceTest {
   private CompanyRepository companyRepository;
   private ContactPersonRepository contactPersonRepository;
   private ContactPersonCrudService contactPersonService;
+  private PhoneNumberUtil phoneNumberUtil;
 
   private Company company1;
   private Company company2;
@@ -44,7 +46,7 @@ class ContactPersonServiceTest {
     this.companyRepository = Mockito.mock(CompanyRepository.class);
     this.contactPersonRepository = Mockito.mock(ContactPersonRepository.class);
     this.contactPersonService =
-        new ContactPersonService(contactPersonRepository, companyRepository);
+        new ContactPersonService(contactPersonRepository, companyRepository, phoneNumberUtil);
     this.company1 = new Company(1L, "Company#1");
     this.company2 = new Company(2L, "Company#2");
     this.company3 = new Company(3L, "Company#3");
@@ -123,7 +125,7 @@ class ContactPersonServiceTest {
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.empty());
 
-    Assertions.assertThrows(MyResourceNotFoundException.class,
+    Assertions.assertThrows(ResourceNotFoundException.class,
         () -> contactPersonService.getById(123L));
   }
 
@@ -135,7 +137,7 @@ class ContactPersonServiceTest {
             123L, contactPerson1
             .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.empty());
-    Assertions.assertThrows(MyResourceNotFoundException.class,
+    Assertions.assertThrows(ResourceNotFoundException.class,
         () -> contactPersonService.create(contactPersonInputDto));
   }
 
@@ -160,7 +162,7 @@ class ContactPersonServiceTest {
             123L, contactPerson1
             .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.empty());
-    Assertions.assertThrows(MyResourceNotFoundException.class,
+    Assertions.assertThrows(ResourceNotFoundException.class,
         () -> contactPersonService.update(contactPersonInputDto, 12L));
   }
 
@@ -173,7 +175,7 @@ class ContactPersonServiceTest {
             .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.empty());
-    Assertions.assertThrows(MyResourceNotFoundException.class,
+    Assertions.assertThrows(ResourceNotFoundException.class,
         () -> contactPersonService.update(contactPersonInputDto, 12L));
   }
 
@@ -197,7 +199,7 @@ class ContactPersonServiceTest {
   void deleteShouldThrowMyResourceNotFoundException() {
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.empty());
-    Assertions.assertThrows(MyResourceNotFoundException.class,
+    Assertions.assertThrows(ResourceNotFoundException.class,
         () -> contactPersonService.delete(123L));
   }
 
