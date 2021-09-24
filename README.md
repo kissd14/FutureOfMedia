@@ -37,3 +37,8 @@ jDBC connection string: `jdbc:postgresql://localhost:15432/contactsapi`
 Felhasználónév: `contactsapi`  
 Jelszó: `contactsapi`  
 Adatbázis: `contactsapi`
+
+### Dokumentáció
+
+Az alkalmazás elindítása után, a következő címen érhető el:
+`http://localhost:8080/swagger-ui/`
