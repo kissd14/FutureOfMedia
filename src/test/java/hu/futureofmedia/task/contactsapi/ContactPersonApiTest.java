@@ -10,9 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 import hu.futureofmedia.task.contactsapi.controllers.ContactPersonController;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonResponseDto;
+import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
@@ -47,7 +45,7 @@ public class ContactPersonApiTest {
   private Company company3;
   private ContactPersonsResponseDto contactPersonsResponseDto;
   private List<ContactPerson> contactPersonList;
-  private List<ContactPersonResponseDto> contactPersonResponseDtoList;
+  private List<ContactPersonDto> ContactPersonDtoList;
 
   @BeforeEach
   public void setUp() {
@@ -71,27 +69,50 @@ public class ContactPersonApiTest {
         new ContactPerson(3L, "Anna", "Big", "anabig@gmail.com", "+36707416892", company3,
             "unreachable on mondays", Status.ACTIVE,
             LocalDateTime.now(), LocalDateTime.now());
-    ContactPersonResponseDto contactPersonResponseDto1 =
-        new ContactPersonResponseDto(contactPerson1.getId(),
-            contactPerson1.getLastName() + " " + contactPerson1.getFirstName(),
-            contactPerson1.getCompany().getName(), contactPerson1.getEmail(),
-            contactPerson1.getPhoneNumber());
-    ContactPersonResponseDto contactPersonResponseDto2 =
-        new ContactPersonResponseDto(contactPerson2.getId(),
-            contactPerson2.getLastName() + " " + contactPerson2.getFirstName(),
-            contactPerson2.getCompany().getName(), contactPerson2.getEmail(),
-            contactPerson2.getPhoneNumber());
-    ContactPersonResponseDto contactPersonResponseDto3 =
-        new ContactPersonResponseDto(contactPerson3.getId(),
-            contactPerson3.getLastName() + " " + contactPerson3.getFirstName(),
-            contactPerson3.getCompany().getName(), contactPerson3.getEmail(),
-            contactPerson3.getPhoneNumber());
-    this.contactPersonResponseDtoList = new ArrayList<>();
-    contactPersonResponseDtoList.add(contactPersonResponseDto3);
-    contactPersonResponseDtoList.add(contactPersonResponseDto1);
-    contactPersonResponseDtoList.add(contactPersonResponseDto2);
+    ContactPersonDto ContactPersonDto1 =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
+    ContactPersonDto ContactPersonDto2 =
+        new ContactPersonDto(
+            contactPerson2.getId(),
+            contactPerson2.getFirstName(),
+            contactPerson2.getLastName(),
+            contactPerson2.getCompany().getId(),
+            contactPerson2.getCompany().getName(),
+            contactPerson2.getEmail(),
+            contactPerson2.getPhoneNumber(),
+            contactPerson2.getNote(),
+            contactPerson2.getCreatedAt(),
+            contactPerson2.getLastModifiedAt());
+
+    ContactPersonDto ContactPersonDto3 =
+        new ContactPersonDto(
+            contactPerson3.getId(),
+            contactPerson3.getFirstName(),
+            contactPerson3.getLastName(),
+            contactPerson3.getCompany().getId(),
+            contactPerson3.getCompany().getName(),
+            contactPerson3.getEmail(),
+            contactPerson3.getPhoneNumber(),
+            contactPerson3.getNote(),
+            contactPerson3.getCreatedAt(),
+            contactPerson3.getLastModifiedAt());
+
+    this.ContactPersonDtoList = new ArrayList<>();
+    ContactPersonDtoList.add(ContactPersonDto3);
+    ContactPersonDtoList.add(ContactPersonDto1);
+    ContactPersonDtoList.add(ContactPersonDto2);
     this.contactPersonsResponseDto =
-        new ContactPersonsResponseDto(1, 10, 3, contactPersonResponseDtoList);
+        new ContactPersonsResponseDto(1, 10, 3, ContactPersonDtoList);
     this.contactPersonList = new ArrayList<>();
     contactPersonList.add(contactPerson3);
     contactPersonList.add(contactPerson1);
@@ -109,21 +130,27 @@ public class ContactPersonApiTest {
         .andExpect(jsonPath("page", is(1)))
         .andExpect(jsonPath("pageSize", is(10)))
         .andExpect(jsonPath("total", is(3)))
-        .andExpect(jsonPath("contactPersonResponseDtoList[0].id", is(3)))
-        .andExpect(jsonPath("contactPersonResponseDtoList[0].name", is("Ana Big")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[0].companyName", is("Company#3")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[0].email", is("anabig@gmail.com")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[0].phoneNumber", is("+36707416892")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[1].id", is(1)))
-        .andExpect(jsonPath("contactPersonResponseDtoList[1].name", is("John Doe")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[1].companyName", is("Company#1")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[1].email", is("johndeo@gmail.com")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[1].phoneNumber", is("+36701234567")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[2].id", is(2)))
-        .andExpect(jsonPath("contactPersonResponseDtoList[2].name", is("John Smith")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[2].companyName", is("Company#2")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[2].email", is("johnsmith@gmail.com")))
-        .andExpect(jsonPath("contactPersonResponseDtoList[2].phoneNumber", is("+36208536458")));
+        .andExpect(jsonPath("contactPersonDtoList[0].id", is(3)))
+        .andExpect(jsonPath("contactPersonDtoList[0].firstName", is("Big")))
+        .andExpect(jsonPath("contactPersonDtoList[0].lastName", is("Ana")))
+        .andExpect(jsonPath("contactPersonDtoList[0].companyId", is(3)))
+        .andExpect(jsonPath("contactPersonDtoList[0].companyName", is("Company#3")))
+        .andExpect(jsonPath("contactPersonDtoList[0].email", is("anabig@gmail.com")))
+        .andExpect(jsonPath("contactPersonDtoList[0].phoneNumber", is("+36707416892")))
+        .andExpect(jsonPath("contactPersonDtoList[1].id", is(1)))
+        .andExpect(jsonPath("contactPersonDtoList[1].firstName", is("Doe")))
+        .andExpect(jsonPath("contactPersonDtoList[1].lastName", is("John")))
+        .andExpect(jsonPath("contactPersonDtoList[1].companyId", is(1)))
+        .andExpect(jsonPath("contactPersonDtoList[1].companyName", is("Company#1")))
+        .andExpect(jsonPath("contactPersonDtoList[1].email", is("johndeo@gmail.com")))
+        .andExpect(jsonPath("contactPersonDtoList[1].phoneNumber", is("+36701234567")))
+        .andExpect(jsonPath("contactPersonDtoList[2].id", is(2)))
+        .andExpect(jsonPath("contactPersonDtoList[2].firstName", is("Smith")))
+        .andExpect(jsonPath("contactPersonDtoList[2].lastName", is("John")))
+        .andExpect(jsonPath("contactPersonDtoList[2].companyId", is(2)))
+        .andExpect(jsonPath("contactPersonDtoList[2].companyName", is("Company#2")))
+        .andExpect(jsonPath("contactPersonDtoList[2].email", is("johnsmith@gmail.com")))
+        .andExpect(jsonPath("contactPersonDtoList[2].phoneNumber", is("+36208536458")));
 
   }
 
@@ -179,13 +206,20 @@ public class ContactPersonApiTest {
   @Test
   public void getByIdShouldReturnContactPerson()
       throws Exception {
-    ContactPersonDetailedResponseDto contactPersonDetailedResponseDto =
-        new ContactPersonDetailedResponseDto(contactPerson1.getFirstName(),
-            contactPerson1.getLastName(), contactPerson1.getCompany().getName(),
-            contactPerson1.getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote(),
-            contactPerson1.getCreatedAt(), contactPerson1.getLastModifiedAt());
+    ContactPersonDto contactPersonDto =
+        new ContactPersonDto(
+            1L,
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
     Mockito.when(contactPersonService.getById(Mockito.anyLong()))
-        .thenReturn(contactPersonDetailedResponseDto);
+        .thenReturn(contactPersonDto);
     mockMvc.perform(get("/api/contactperson/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("firstName", is("Doe")))
@@ -257,7 +291,7 @@ public class ContactPersonApiTest {
   @Test
   public void updateShouldResponseNotFound() throws Exception {
     Mockito.doThrow(new ResourceNotFoundException("")).when(contactPersonService)
-        .update(Mockito.any(ContactPersonInputDto.class), Mockito.anyLong());
+        .update(Mockito.any(ContactPersonDto.class), Mockito.anyLong());
     mockMvc.perform(put("/api/contactperson/1")
             .contentType(MediaType.APPLICATION_JSON)
             .content(

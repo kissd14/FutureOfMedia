@@ -19,5 +19,5 @@ public class ContactPersonsResponseDto {
   @Schema(description = "Number of the items on the page")
   private Integer total;
   @Schema(description = "List of the contact persons on the page")
-  private List<ContactPersonResponseDto> contactPersonResponseDtoList;
+  private List<ContactPersonDto> ContactPersonDtoList;
 }

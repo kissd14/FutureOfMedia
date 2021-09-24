@@ -11,10 +11,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ContactPersonDetailedResponseDto {
-
+public class ContactPersonDto {
+  private Long id;
   private String firstName;
   private String lastName;
+  private Long companyId;
   private String companyName;
   private String email;
   private String phoneNumber;

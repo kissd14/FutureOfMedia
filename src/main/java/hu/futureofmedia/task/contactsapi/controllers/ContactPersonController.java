@@ -1,8 +1,7 @@
 package hu.futureofmedia.task.contactsapi.controllers;
 
 import com.google.i18n.phonenumbers.NumberParseException;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
+import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.services.ContactPersonCrudService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,11 +42,11 @@ public class ContactPersonController {
       responses = {
           @ApiResponse(description = "The contact person",
               content = @Content(mediaType = "application/json",
-                  schema = @Schema(implementation = ContactPersonDetailedResponseDto.class))),
+                  schema = @Schema(implementation = ContactPersonDto.class))),
           @ApiResponse(responseCode = "404", description = "Contact person was not found"),
           @ApiResponse(responseCode = "400", description = "Contact person id was in wrong format, or index out of boundary")})
   @GetMapping("/{id}")
-  public ResponseEntity<ContactPersonDetailedResponseDto> getById(@PathVariable @Positive Long id) {
+  public ResponseEntity<ContactPersonDto> getById(@PathVariable @Positive Long id) {
     return ResponseEntity.ok(contactPersonService.getById(id));
   }
 
@@ -76,9 +75,9 @@ public class ContactPersonController {
           @ApiResponse(responseCode = "404", description = "Contact person, or company was not found")})
   @PostMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void create(@RequestBody @Valid ContactPersonInputDto contactPersonInputDto)
+  public void create(@RequestBody @Valid ContactPersonDto ContactPersonDto)
       throws NumberParseException {
-    contactPersonService.create(contactPersonInputDto);
+    contactPersonService.create(ContactPersonDto);
   }
 
   @Operation(summary = "Update contact person by id",
@@ -89,10 +88,10 @@ public class ContactPersonController {
 
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void update(@RequestBody @Valid ContactPersonInputDto contactPersonInputDto, @PathVariable
+  public void update(@RequestBody @Valid ContactPersonDto ContactPersonDto, @PathVariable
   @Positive Long id)
       throws NumberParseException {
-    contactPersonService.update(contactPersonInputDto, id);
+    contactPersonService.update(ContactPersonDto, id);
   }
 
   @Operation(summary = "Delete contact person by id",

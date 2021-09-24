@@ -5,9 +5,8 @@ import static org.mockito.Mockito.times;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDetailedResponseDto;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonInputDto;
-import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonResponseDto;
+import com.google.i18n.phonenumbers.Phonenumber;
+import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonDto;
 import hu.futureofmedia.task.contactsapi.models.dtos.ContactPersonsResponseDto;
 import hu.futureofmedia.task.contactsapi.models.entities.Company;
 import hu.futureofmedia.task.contactsapi.models.entities.ContactPerson;
@@ -38,11 +37,13 @@ class ContactPersonServiceTest {
   private ContactPerson contactPerson1;
   private ContactPerson contactPerson2;
   private ContactPerson contactPerson3;
+  private ContactPerson contactPerson3Create;
   private ContactPerson contactPerson3Updated;
   private ContactPerson contactPerson3Deleted;
 
   @BeforeEach
   public void setUp() {
+    this.phoneNumberUtil = Mockito.mock(PhoneNumberUtil.class);
     this.companyRepository = Mockito.mock(CompanyRepository.class);
     this.contactPersonRepository = Mockito.mock(ContactPersonRepository.class);
     this.contactPersonService =
@@ -63,6 +64,10 @@ class ContactPersonServiceTest {
         new ContactPerson(3L, "Ana", "Big", "anabig@gmail.com", "+36707416892", company3,
             "unreachable on mondays", Status.ACTIVE,
             LocalDateTime.now(), LocalDateTime.now());
+    this.contactPerson3Create =
+        new ContactPerson(null, "Ana", "Big", "anabig@gmail.com", "+36707416892", company3,
+            "unreachable on mondays", Status.ACTIVE,
+            LocalDateTime.now(), LocalDateTime.now());
     this.contactPerson3Updated =
         new ContactPerson(3L, "Anna", "Big", "anabig@gmail.com", "+36707416892", company3,
             "unreachable on mondays", Status.ACTIVE,
@@ -76,33 +81,57 @@ class ContactPersonServiceTest {
   @Test
   @DisplayName("getAll should return the first 3 records in alphabetic order")
   void getAllShouldReturn3Records() {
-    ContactPersonResponseDto contactPersonResponseDto1 =
-        new ContactPersonResponseDto(contactPerson1.getId(),
-            contactPerson1.getLastName() + " " + contactPerson1.getFirstName(),
-            contactPerson1.getCompany().getName(), contactPerson1.getEmail(),
-            contactPerson1.getPhoneNumber());
-    ContactPersonResponseDto contactPersonResponseDto2 =
-        new ContactPersonResponseDto(contactPerson2.getId(),
-            contactPerson2.getLastName() + " " + contactPerson2.getFirstName(),
-            contactPerson2.getCompany().getName(), contactPerson2.getEmail(),
-            contactPerson2.getPhoneNumber());
-    ContactPersonResponseDto contactPersonResponseDto3 =
-        new ContactPersonResponseDto(contactPerson3.getId(),
-            contactPerson3.getLastName() + " " + contactPerson3.getFirstName(),
-            contactPerson3.getCompany().getName(), contactPerson3.getEmail(),
-            contactPerson3.getPhoneNumber());
-    List<ContactPersonResponseDto> contactPersonResponseDtoList = new ArrayList<>();
-    contactPersonResponseDtoList.add(contactPersonResponseDto1);
-    contactPersonResponseDtoList.add(contactPersonResponseDto2);
-    contactPersonResponseDtoList.add(contactPersonResponseDto3);
+    ContactPersonDto ContactPersonDto1 =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
+    ContactPersonDto ContactPersonDto2 =
+        new ContactPersonDto(
+            contactPerson2.getId(),
+            contactPerson2.getFirstName(),
+            contactPerson2.getLastName(),
+            contactPerson2.getCompany().getId(),
+            contactPerson2.getCompany().getName(),
+            contactPerson2.getEmail(),
+            contactPerson2.getPhoneNumber(),
+            contactPerson2.getNote(),
+            contactPerson2.getCreatedAt(),
+            contactPerson2.getLastModifiedAt());
+
+    ContactPersonDto ContactPersonDto3 =
+        new ContactPersonDto(
+            contactPerson3.getId(),
+            contactPerson3.getFirstName(),
+            contactPerson3.getLastName(),
+            contactPerson3.getCompany().getId(),
+            contactPerson3.getCompany().getName(),
+            contactPerson3.getEmail(),
+            contactPerson3.getPhoneNumber(),
+            contactPerson3.getNote(),
+            contactPerson3.getCreatedAt(),
+            contactPerson3.getLastModifiedAt());
+
+    List<ContactPersonDto> contactPersonDtoList = new ArrayList<>();
+    contactPersonDtoList.add(ContactPersonDto1);
+    contactPersonDtoList.add(ContactPersonDto2);
+    contactPersonDtoList.add(ContactPersonDto3);
     ContactPersonsResponseDto contactPersonsResponseDto =
-        new ContactPersonsResponseDto(1, 10, 3, contactPersonResponseDtoList);
+        new ContactPersonsResponseDto(1, 10, 3, contactPersonDtoList);
     List<ContactPerson> contactPersonList = new ArrayList<>();
     contactPersonList.add(contactPerson1);
     contactPersonList.add(contactPerson2);
     contactPersonList.add(contactPerson3);
     Mockito.when(contactPersonRepository.getAllByPageAndPageSize(Mockito.any()))
         .thenReturn(contactPersonList);
+    Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.of(company1));
     Assertions.assertEquals(contactPersonsResponseDto, contactPersonService.getAll(1, 10));
   }
 
@@ -111,12 +140,20 @@ class ContactPersonServiceTest {
   void getByIdShouldReturnWithTheCorrectDTO() {
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.of(contactPerson1));
-    ContactPersonDetailedResponseDto contactPersonDetailedResponseDto =
-        new ContactPersonDetailedResponseDto(contactPerson1.getFirstName(),
-            contactPerson1.getLastName(), contactPerson1.getCompany().getName(),
-            contactPerson1.getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote(),
-            contactPerson1.getCreatedAt(), contactPerson1.getLastModifiedAt());
-    Assertions.assertEquals(contactPersonService.getById(1L), contactPersonDetailedResponseDto);
+    Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.of(company1));
+    ContactPersonDto contactPersonDto =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
+    Assertions.assertEquals(contactPersonService.getById(1L), contactPersonDto);
   }
 
   @Test
@@ -132,65 +169,114 @@ class ContactPersonServiceTest {
   @Test
   @DisplayName("create should throw MyResourceNotFoundException")
   void createShouldThrowMyResourceNotFoundException() {
-    ContactPersonInputDto contactPersonInputDto =
-        new ContactPersonInputDto(contactPerson1.getFirstName(), contactPerson1.getLastName(),
-            123L, contactPerson1
-            .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
+    ContactPersonDto ContactPersonDto =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.empty());
     Assertions.assertThrows(ResourceNotFoundException.class,
-        () -> contactPersonService.create(contactPersonInputDto));
+        () -> contactPersonService.create(ContactPersonDto));
   }
 
   @Test
   @DisplayName("create should create contact person")
   void createShouldCreateContactPerson() throws NumberParseException {
-    ContactPersonInputDto contactPersonInputDto =
-        new ContactPersonInputDto(contactPerson3.getFirstName(), contactPerson3.getLastName(),
-            contactPerson3.getCompany().getId(), contactPerson3
-            .getEmail(), contactPerson3.getPhoneNumber(), contactPerson3.getNote());
+    ContactPersonDto contactPersonDto =
+        new ContactPersonDto(
+            contactPerson3.getId(),
+            contactPerson3.getFirstName(),
+            contactPerson3.getLastName(),
+            contactPerson3.getCompany().getId(),
+            contactPerson3.getCompany().getName(),
+            contactPerson3.getEmail(),
+            contactPerson3.getPhoneNumber(),
+            contactPerson3.getNote(),
+            contactPerson3.getCreatedAt(),
+            contactPerson3.getLastModifiedAt());
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong()))
         .thenReturn(Optional.of(company3));
-    contactPersonService.create(contactPersonInputDto);
-    Mockito.verify(contactPersonRepository, times(1)).save(contactPerson3);
+    Mockito.when(phoneNumberUtil.isValidNumber(Mockito.any())).thenReturn(true);
+    contactPersonService.create(contactPersonDto);
+    Mockito.verify(contactPersonRepository, times(1)).save(contactPerson3Create);
   }
 
   @Test
   @DisplayName("update should throw MyResourceNotFoundException")
   void updateShouldThrowMyResourceNotFoundExceptionBecauseOfCompany() {
-    ContactPersonInputDto contactPersonInputDto =
-        new ContactPersonInputDto(contactPerson1.getFirstName(), contactPerson1.getLastName(),
-            123L, contactPerson1
-            .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
+    ContactPersonDto ContactPersonDto =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong())).thenReturn(Optional.empty());
     Assertions.assertThrows(ResourceNotFoundException.class,
-        () -> contactPersonService.update(contactPersonInputDto, 12L));
+        () -> contactPersonService.update(ContactPersonDto, 12L));
   }
 
   @Test
   @DisplayName("update should throw MyResourceNotFoundException")
   void updateShouldThrowMyResourceNotFoundExceptionBecauseOfContactPerson() {
-    ContactPersonInputDto contactPersonInputDto =
-        new ContactPersonInputDto(contactPerson1.getFirstName(), contactPerson1.getLastName(),
-            1L, contactPerson1
-            .getEmail(), contactPerson1.getPhoneNumber(), contactPerson1.getNote());
+    ContactPersonDto ContactPersonDto =
+        new ContactPersonDto(
+            contactPerson1.getId(),
+            contactPerson1.getFirstName(),
+            contactPerson1.getLastName(),
+            contactPerson1.getCompany().getId(),
+            contactPerson1.getCompany().getName(),
+            contactPerson1.getEmail(),
+            contactPerson1.getPhoneNumber(),
+            contactPerson1.getNote(),
+            contactPerson1.getCreatedAt(),
+            contactPerson1.getLastModifiedAt());
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.empty());
     Assertions.assertThrows(ResourceNotFoundException.class,
-        () -> contactPersonService.update(contactPersonInputDto, 12L));
+        () -> contactPersonService.update(ContactPersonDto, 12L));
   }
 
   @Test
   @DisplayName("update should update contact person")
   void updateShouldUpdateContactPerson() throws NumberParseException {
-    ContactPersonInputDto contactPersonInputDto =
-        new ContactPersonInputDto(contactPerson3.getFirstName(), "Anna",
-            contactPerson3.getCompany().getId(), contactPerson3
-            .getEmail(), contactPerson3.getPhoneNumber(), contactPerson3.getNote());
+    ContactPersonDto ContactPersonDto =
+        new ContactPersonDto(
+            contactPerson3.getId(),
+            contactPerson3.getFirstName(),
+            "Anna",
+            contactPerson3.getCompany().getId(),
+            contactPerson3.getCompany().getName(),
+            contactPerson3.getEmail(),
+            contactPerson3.getPhoneNumber(),
+            contactPerson3.getNote(),
+            contactPerson3.getCreatedAt(),
+            contactPerson3.getLastModifiedAt());
     Mockito.when(contactPersonRepository.findByIdAndStatusActive(Mockito.anyLong()))
         .thenReturn(Optional.of(contactPerson3));
     Mockito.when(companyRepository.findCompanyById(Mockito.anyLong()))
         .thenReturn(Optional.of(company3));
-    contactPersonService.update(contactPersonInputDto, 3L);
+    Mockito.when(companyRepository.findCompanyById(Mockito.anyLong()))
+        .thenReturn(Optional.of(company3));
+    Phonenumber.PhoneNumber phoneNumber = new Phonenumber.PhoneNumber();
+    phoneNumber.setCountryCode(36);
+    phoneNumber.setRawInput("+36704064785");
+    Mockito.when(phoneNumberUtil.parse(Mockito.any(),Mockito.any())).thenReturn(phoneNumber);
+    Mockito.when(phoneNumberUtil.isValidNumber(Mockito.any())).thenReturn(true);
+    contactPerson3Updated.setPhoneNumber(phoneNumber.toString());
+    contactPersonService.update(ContactPersonDto, 3L);
     Mockito.verify(contactPersonRepository, times(1)).save(contactPerson3Updated);
   }
 

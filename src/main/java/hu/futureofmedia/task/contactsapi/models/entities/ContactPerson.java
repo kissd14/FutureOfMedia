@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "contact_persons")
-@EqualsAndHashCode(exclude = {"createdAt","lastModifiedAt","id"})
+@EqualsAndHashCode(exclude = {"createdAt","lastModifiedAt","phoneNumber"})
 public class ContactPerson {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
