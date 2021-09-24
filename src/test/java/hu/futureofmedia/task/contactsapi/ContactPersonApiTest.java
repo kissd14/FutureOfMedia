@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +98,7 @@ public class ContactPersonApiTest {
     contactPersonList.add(contactPerson2);
   }
 
+  @DisplayName("getAllOnThePage Should return 3 contact persons in alphabetic order with page 1, pageSize 10 and total 3")
   @Test
   public void getAllOnThePageShouldResponseOkAndReturnWith3ContactPersonsInAlphabeticOrder()
       throws Exception {
@@ -125,6 +127,7 @@ public class ContactPersonApiTest {
 
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of missing parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestMissingParameter()
       throws Exception {
@@ -132,6 +135,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of invalid (string) parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestInvalidParameterString()
       throws Exception {
@@ -139,6 +143,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of invalid (negative number) parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestInvalidParameterNegativeNumber()
       throws Exception {
@@ -146,6 +151,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of invalid (string) parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestInvalidParameterPageSizeString()
       throws Exception {
@@ -153,6 +159,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of invalid (negative number) parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestInvalidParameterPageSizeNegativeNumber()
       throws Exception {
@@ -160,6 +167,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getAllOnThePage should return 400, because of invalid (too big number) parameter")
   @Test
   public void getAllOnThePageShouldResponseBadRequestInvalidParameterPageSizeTooBigNumber()
       throws Exception {
@@ -167,6 +175,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getById should return 200, and the detailed contact person info")
   @Test
   public void getByIdShouldReturnContactPerson()
       throws Exception {
@@ -187,6 +196,7 @@ public class ContactPersonApiTest {
         .andExpect(jsonPath("note", is("great at listening")));
   }
 
+  @DisplayName("getByID should return 400, because of invalid (string) parameter")
   @Test
   public void getByIdShouldResponseBadRequestInvalidParameterString()
       throws Exception {
@@ -194,6 +204,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getByID should return 400, because of invalid (negative number) parameter")
   @Test
   public void getByIdShouldResponseBadRequestInvalidParameterNegativeNumber()
       throws Exception {
@@ -201,6 +212,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getByID should return 400, because of missing parameter")
   @Test
   public void getByIdShouldResponseBadRequestMissingParameter()
       throws Exception {
@@ -208,6 +220,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isBadRequest());
   }
 
+  @DisplayName("getByID should return 404, because of the provided id parameter doesn't exist in the database")
   @Test
   public void getByIdShouldResponseNotFound()
       throws Exception {
@@ -217,6 +230,7 @@ public class ContactPersonApiTest {
         .andExpect(status().isNotFound());
   }
 
+  @DisplayName("create should return 204")
   @Test
   public void createShouldCreateContactPersonAndRespondNoContent() throws Exception {
     mockMvc.perform(post("/api/contactperson")
@@ -228,6 +242,7 @@ public class ContactPersonApiTest {
 
   }
 
+  @DisplayName("update should return 204")
   @Test
   public void updateShouldUpdateContactPersonAndRespondNoContent() throws Exception {
     mockMvc.perform(put("/api/contactperson/1")
@@ -238,24 +253,27 @@ public class ContactPersonApiTest {
         .andExpect(status().isNoContent());
   }
 
+  @DisplayName("update should return 404, because of the provided id parameter doesn't exist in the database")
   @Test
   public void updateShouldResponseNotFound() throws Exception {
     Mockito.doThrow(new MyResourceNotFoundException("")).when(contactPersonService)
         .update(Mockito.any(ContactPersonInputDto.class), Mockito.anyLong());
     mockMvc.perform(put("/api/contactperson/1")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(
-            "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"companyId\":1," +
-                "\"email\":\"johndoe@gmail.com\",\"phoneNumber\":\"+361234567\",\"note\":\"it's a note\"}"))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"companyId\":1," +
+                    "\"email\":\"johndoe@gmail.com\",\"phoneNumber\":\"+361234567\",\"note\":\"it's a note\"}"))
         .andExpect(status().isNotFound());
   }
 
+  @DisplayName("delete should return 204")
   @Test
   public void deleteShouldDeleteContactPersonAndRespondNoContent() throws Exception {
     mockMvc.perform(delete("/api/contactperson/1"))
         .andExpect(status().isNoContent());
   }
 
+  @DisplayName("delete should return 404, because of the provided id parameter doesn't exist in the database")
   @Test
   public void deleteShouldResponseNotFound() throws Exception {
     Mockito.doThrow(new MyResourceNotFoundException("")).when(contactPersonService)
